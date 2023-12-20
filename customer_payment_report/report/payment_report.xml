@@ -1,0 +1,107 @@
+<?xml version='1.0' encoding='utf-8'?>
+<odoo>
+
+    <record id="customer_payment_report_wizard" model="ir.ui.view">
+        <field name="name">customer.payment.report.wizard</field>
+        <field name="model">customer.payment.report</field>
+        <field name="arch" type="xml">
+            <form string="">
+                <sheet>
+                    <group>
+                        <field name="date_from"/>
+                        <field name="date_to"/>
+                    </group>
+                     <button name="action_print_report" string="Print Report"
+                            type="object" class="oe_highlight"/>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+    <report
+            id="customer_payment_pdf_report"
+            model="customer.payment.report"
+            string="Customer Payment Report"
+            report_type="qweb-pdf"
+            name="customer_payment_report.customer_payment_report_template"
+            file="customer_payment_report.customer_payment_report_template"
+            attachment_use="True"
+    />
+     <template id="customer_payment_report_template">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="doc">
+                <t t-call="web.external_layout">
+                    <center>
+                        <h4>Report from
+                            <t t-esc="doc.date_from"/>
+                            to
+                            <t t-esc="doc.date_to"/>
+                        </h4>
+                    </center>
+                    <table style="width:100%;text-align:center;">
+                        <thead>
+                            <tr style="border-bottom:1pt solid grey;">
+                                <th style="text-align:center;">
+                                    <strong>Customer</strong>
+                                </th>
+                                <th style="text-align:center;width:25%">
+                                    <strong>First Sale Date</strong>
+                                </th>
+                                <th style="text-align:center;width:25%">
+                                    <strong>Total Sales</strong>
+                                </th>
+                                <th style="text-align:center;width:25%">
+                                    <strong>Total Amount</strong>
+                                </th>
+                                <th style="text-align:center;width:25%">
+                                    <strong>Paid Amount</strong>
+                                </th>
+                                <th style="text-align:center;width:25%">
+                                    <strong>Balance</strong>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            <t t-foreach="doc.get_customer_payments()" t-as="payment" style="font-size:13px;">
+                                
+                            <tr style="padding:5px;border-bottom:1pt solid grey;">
+                                <td style="text-align:center;">
+                                            <span t-esc="payment['customer_name']"/>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span t-esc="payment['first_sale_order_date']"/>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span t-esc="payment['total_sale_orders']"/>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span t-esc="payment['total_amount']"/>
+                                </td>
+                                <!-- <td style="text-align:center;">
+                                    <span t-esc="payment['total_paid_amount']"/>
+                                </td>
+                                <td style="text-align:center;">
+                                    <span t-esc="payment['balance_amount']"/>
+                                </td> -->
+                            </tr>
+                        </t>
+                        </tbody>
+                    </table>
+                    <br/>
+                </t>
+            </t>
+        </t>
+    </template>
+
+    <record id="customer_payment_report" model="ir.actions.act_window">
+        <field name="name">Payment Report</field>
+        <field name="res_model">customer.payment.report</field>
+        <field name="view_mode">form</field>
+        <field name="view_id" ref="customer_payment_report_wizard"/>
+        <field name="target">new</field>
+    </record>
+    
+    <menuitem id="payment_report" name="Customer Payment Report" action="customer_payment_report" parent="account.menu_finance_reports" sequence="10"/>
+
+</odoo>
